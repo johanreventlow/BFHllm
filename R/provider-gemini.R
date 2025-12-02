@@ -79,7 +79,7 @@ gemini_call_api <- function(prompt, model, timeout) {
 
   chat <- ellmer::chat_google_gemini(
     model = model,
-    api_key = api_key
+    credentials = api_key
   )
 
   # Call with timeout wrapper

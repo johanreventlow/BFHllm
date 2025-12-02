@@ -94,7 +94,7 @@ tryCatch(
       location = store_path,
       embed = ragnar::embed_google_gemini(
         model = "gemini-embedding-001",
-        api_key = api_key
+        credentials = api_key
       ),
       overwrite = TRUE,  # Overwrite if exists
       name = "spc_knowledge",
