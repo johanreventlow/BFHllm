@@ -17,8 +17,7 @@ RoxygenNote: 7.3.3
 Imports:
     ellmer (>= 0.2.0),
     ragnar (>= 0.1.0),
-    digest,
-    stringr (>= 1.5.0)
+    digest
 Suggests:
     testthat (>= 3.0.0),
     shiny (>= 1.7.0),

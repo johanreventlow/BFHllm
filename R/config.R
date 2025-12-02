@@ -1,6 +1,9 @@
 # config.R
 # Configuration Management for BFHllm
 
+#' @importFrom utils modifyList
+NULL
+
 # PACKAGE ENVIRONMENT ===========================================================
 
 # Package-level environment for storing configuration

@@ -214,10 +214,10 @@ bfhllm_build_knowledge_store <- function(docs_path, output_path) {
   message("Docs path: ", docs_path)
   message("Output path: ", output_path)
 
-  # Initialize store
+  # Initialize store with Gemini embeddings
   store <- ragnar::ragnar_store_create(
     location = output_path,
-    embedding_provider = "gemini"
+    embed = ragnar::embed_google_gemini(api_key = Sys.getenv("GEMINI_API_KEY"))
   )
 
   # Add documents
