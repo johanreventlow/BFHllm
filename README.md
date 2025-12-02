@@ -31,7 +31,7 @@ remotes::install_github("johanreventlow/BFHllm")
 library(BFHllm)
 
 # Set API key
-Sys.setenv(GOOGLE_API_KEY = "your_api_key")
+# Sys.setenv(GOOGLE_API_KEY = "your_api_key")
 
 # Simple chat
 response <- bfhllm_chat(

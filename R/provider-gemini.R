@@ -72,14 +72,10 @@ gemini_call_api <- function(prompt, model, timeout) {
   }
 
   # Initialize chat
-  api_key <- Sys.getenv("GOOGLE_API_KEY", unset = "")
-  if (api_key == "") {
-    api_key <- Sys.getenv("GEMINI_API_KEY")
-  }
-
+  # ellmer 0.4.0+ automatically reads GOOGLE_API_KEY or GEMINI_API_KEY from environment
+  # when credentials = NULL (default)
   chat <- ellmer::chat_google_gemini(
-    model = model,
-    credentials = api_key
+    model = model
   )
 
   # Call with timeout wrapper

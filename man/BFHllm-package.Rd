@@ -2,11 +2,10 @@
 % Please edit documentation in R/BFHllm-package.R
 \docType{package}
 \name{BFHllm-package}
+\alias{BFHllm}
 \alias{BFHllm-package}
 \title{BFHllm: LLM Integration Framework for BFH Packages}
 \description{
-AI-driven insights and text generation for healthcare quality improvement. Provides LLM chat interface, RAG (Retrieval Augmented Generation) integration with knowledge stores, and SPC-specific improvement suggestions. Designed for standalone use with BFHcharts or integration in Shiny applications.
-
 BFHllm provides AI-driven insights and text generation for healthcare quality
 improvement. The package offers LLM chat interface, RAG (Retrieval Augmented
 Generation) integration with knowledge stores, and SPC-specific improvement
@@ -111,13 +110,6 @@ suggestion <- bfhllm_spc_suggestion(
 }
 
 \seealso{
-Useful links:
-\itemize{
-  \item \url{https://github.com/johanreventlow/BFHllm}
-  \item Report bugs at \url{https://github.com/johanreventlow/BFHllm/issues}
-}
-
-
 Useful links:
 \itemize{
   \item \url{https://github.com/johanreventlow/BFHllm}
