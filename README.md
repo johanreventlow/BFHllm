@@ -45,21 +45,51 @@ response <- bfhllm_chat(
 library(BFHcharts)
 library(BFHllm)
 
-# Generate SPC chart
-result <- bfh_qic(data, x = date, y = value, chart = "run")
+# Create SPC chart
+bfh_result <- bfh_qic(
+  data = spc_data,
+  x = date,
+  y = waiting_time,
+  chart_type = "run",
+  y_axis_unit = "time",
+  target_value = 30
+)
 
-# Get AI-driven improvement suggestion
+# Build metadata structure for BFHllm
+spc_result <- list(
+  metadata = list(
+    chart_type = bfh_result$config$chart_type,
+    n_points = nrow(bfh_result$qic_data),
+    signals_detected = sum(bfh_result$summary$løbelængde_signal,
+                          bfh_result$summary$sigma_signal, na.rm = TRUE),
+    anhoej_rules = list(
+      longest_run = bfh_result$summary$længste_løb,
+      n_crossings = bfh_result$summary$antal_kryds,
+      n_crossings_min = bfh_result$summary$antal_kryds_min
+    )
+  ),
+  qic_data = bfh_result$qic_data
+)
+
+# Define context
+context <- list(
+  data_definition = "Ventetid til operation (dage)",
+  chart_title = "Ventetid ortopædkirurgi 2023-2024",
+  y_axis_unit = "time",
+  target_value = 30
+)
+
+# Get AI-driven improvement suggestion (with RAG)
 suggestion <- bfhllm_spc_suggestion(
-  spc_result = result,
-  context = list(
-    title = "Emergency Department Wait Time",
-    unit = "minutes",
-    target_value = 60
-  )
+  spc_result = spc_result,
+  context = context,
+  use_rag = TRUE
 )
 
 print(suggestion)
 ```
+
+**Full example:** See `inst/examples/bfhcharts-integration.R` for complete standalone integration including caching and RAG comparison.
 
 ### RAG-Enhanced Chat
 
