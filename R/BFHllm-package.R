@@ -1,10 +1,3 @@
-#' @keywords internal
-"_PACKAGE"
-
-## usethis namespace: start
-## usethis namespace: end
-NULL
-
 #' BFHllm: LLM Integration Framework for BFH Packages
 #'
 #' @description
@@ -89,6 +82,9 @@ NULL
 #' * [ragnar](https://github.com/edubruell/ragnar) - RAG knowledge store
 #' * [BFHcharts](https://github.com/johanreventlow/BFHcharts) - SPC visualization
 #'
-#' @docType package
-#' @name BFHllm-package
+#' @keywords internal
+"_PACKAGE"
+
+## usethis namespace: start
+## usethis namespace: end
 NULL
