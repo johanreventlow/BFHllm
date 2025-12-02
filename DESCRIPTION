@@ -1,0 +1,28 @@
+Package: BFHllm
+Title: LLM Integration Framework for BFH Packages
+Version: 0.1.0
+Authors@R:
+    person("Johan", "Reventlow", , "johan.reventlow@regionh.dk", role = c("aut", "cre"))
+Description: AI-driven insights and text generation for healthcare quality
+    improvement. Provides LLM chat interface, RAG (Retrieval Augmented
+    Generation) integration with knowledge stores, and SPC-specific
+    improvement suggestions. Designed for standalone use with BFHcharts
+    or integration in Shiny applications.
+License: MIT + file LICENSE
+URL: https://github.com/johanreventlow/BFHllm
+BugReports: https://github.com/johanreventlow/BFHllm/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    ellmer (>= 0.2.0),
+    ragnar (>= 0.1.0),
+    digest,
+    stringr (>= 1.5.0)
+Suggests:
+    testthat (>= 3.0.0),
+    shiny (>= 1.7.0),
+    mockery,
+    withr,
+    BFHcharts (>= 0.4.0)
+Config/testthat/edition: 3
