@@ -260,7 +260,9 @@ EKSEMPEL:
 \"Mere end 35.000 gange om måneden administreres medicin ikke korrekt. Processen varierer ikke naturligt, og indeholder 3 særligt afvigende målepunkter. Niveauet er under målet. Forslag: **Identificér årsager bag de afvigende målepunkter**, og understøt faktorer der kan forbedre målopfyldelsen. Stabilisér processen når niveauet er tilfredsstillende.\"
 
 VIGTIGE REGLER:
-- KRITISK: Analysen må ALDRIG overstige {{max_chars}} tegn. Afslut med en komplet sætning inden grænsen.
+- KRITISK: Svaret SKAL være mellem {{min_chars}} og {{max_chars}} tegn. Tæl tegnene nøje!
+- Afslut ALTID med en komplet sætning - aldrig med '...' eller afbrudte ord
+- Planlæg din tekst så den passer inden for grænsen og slutter naturligt
 - Dansk sprog
 - Konkret og handlingsorienteret
 - Brug fed (**tekst**) til forslag, men vær selektiv - kun 1-2 forslag, max 3 i sjældnere tilfælde.
