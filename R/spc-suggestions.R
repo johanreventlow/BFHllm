@@ -231,7 +231,7 @@ get_spc_prompt_template <- function() {
   template <- "
 Du er en ekspert i Statistical Process Control (SPC) og klinisk kvalitetsforbedring. Du vurderer SPC-processer efter Anhøj-reglerne.
 
-Baseret på følgende SPC-data, skal du generere en kort positivt og handlingsorienteret analyse af et seriediagram (max {{max_chars}} tegn) på dansk. Formater target_values i samme enhed som {{y_axis_unit}}.
+Baseret på følgende SPC-data, skal du generere en kort positivt og handlingsorienteret analyse af et seriediagram (mellem {{min_chars}} og {{max_chars}} tegn) på dansk. Formater target_values i samme enhed som {{y_axis_unit}}.
 
 KONTEKST:
 - Indikator: {{data_definition}}
@@ -260,7 +260,7 @@ EKSEMPEL:
 \"Mere end 35.000 gange om måneden administreres medicin ikke korrekt. Processen varierer ikke naturligt, og indeholder 3 særligt afvigende målepunkter. Niveauet er under målet. Forslag: **Identificér årsager bag de afvigende målepunkter**, og understøt faktorer der kan forbedre målopfyldelsen. Stabilisér processen når niveauet er tilfredsstillende.\"
 
 VIGTIGE REGLER:
-- Maksimalt {{max_chars}} tegn
+- Mellem {{min_chars}} og {{max_chars}} tegn (vigtigt!)
 - Dansk sprog
 - Konkret og handlingsorienteret
 - Brug fed (**tekst**) til forslag, men vær selektiv - kun 1-2 forslag, max 3 i sjældnere tilfælde.
@@ -283,7 +283,8 @@ VIGTIGE REGLER:
 #'   - chart_title: Chart title (character)
 #'   - y_axis_unit: Unit of measurement (e.g., "dage", "antal", "procent")
 #'   - target_value: Target value (numeric, optional)
-#' @param max_chars Maximum characters in response (default: 350)
+#' @param min_chars Minimum characters in response (default: 300)
+#' @param max_chars Maximum characters in response (default: 400)
 #' @param use_rag Logical, use RAG for SPC methodology context (default: TRUE)
 #' @param cache Cache object from bfhllm_cache_create() or bfhllm_cache_shiny() (optional)
 #' @param ... Additional arguments passed to bfhllm_chat() (model, timeout, etc.)
@@ -337,7 +338,8 @@ VIGTIGE REGLER:
 #' @export
 bfhllm_spc_suggestion <- function(spc_result,
                                    context,
-                                   max_chars = 350,
+                                   min_chars = 300,
+                                   max_chars = 400,
                                    use_rag = TRUE,
                                    cache = NULL,
                                    ...) {
@@ -363,7 +365,7 @@ bfhllm_spc_suggestion <- function(spc_result,
   # Step 3: Check cache (if provided)
   if (!is.null(cache)) {
     # Build cache key from metadata + context
-    cache_data <- c(metadata, context, list(max_chars = max_chars))
+    cache_data <- c(metadata, context, list(min_chars = min_chars, max_chars = max_chars))
     cache_key <- bfhllm_generate_cache_key(cache_data)
 
     cached <- cache$get(cache_key)
@@ -422,6 +424,7 @@ bfhllm_spc_suggestion <- function(spc_result,
     context,
     list(
       target_comparison = target_comparison,
+      min_chars = min_chars,
       max_chars = max_chars
     )
   )
