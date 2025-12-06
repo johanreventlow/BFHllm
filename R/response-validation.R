@@ -84,27 +84,43 @@ validate_response <- function(text, max_chars = 350) {
 #' Trim Text to Character Limit
 #'
 #' Trims text to maximum character limit while:
-#' - Preserving word boundaries (no mid-word cuts)
+#' - Preserving complete sentences (finds last sentence-ending punctuation)
 #' - Balancing markdown asterisks
-#' - Appending "..." to indicate truncation
+#' - Never appending "..." - text ends with complete sentence
 #'
 #' @param text Character string to trim
 #' @param max_chars Integer, maximum allowed characters
 #'
-#' @return Character string, trimmed text with "..." appended
+#' @return Character string, trimmed text ending with complete sentence
 #'
 #' @keywords internal
 trim_to_limit <- function(text, max_chars) {
-  # Reserve 3 characters for "..."
-  target_length <- max_chars - 3
+  # Trim to max length first
+  trimmed <- substr(text, 1, max_chars)
 
-  # Trim to target length
-  text <- substr(text, 1, target_length)
+  # Find the last sentence-ending punctuation (. ! ?)
 
-  # Find last space to avoid cutting mid-word
-  last_space <- regexpr("\\s[^\\s]*$", text)
-  if (last_space > 0) {
-    text <- substr(text, 1, last_space)
+  # Also handle sentences ending with ** (bold markdown) before punctuation
+  sentence_end_pattern <- "[.!?](?:\\*\\*)?\\s*$|[.!?](?:\\*\\*)?(?=\\s)"
+
+  # Find all sentence endings
+  matches <- gregexpr("[.!?](?:\\*\\*)?", trimmed)[[1]]
+
+  if (matches[1] != -1) {
+    # Get the last sentence ending position
+    last_match <- max(matches)
+    match_length <- attr(matches, "match.length")[which.max(matches)]
+
+    # Cut at end of last complete sentence
+    text <- substr(trimmed, 1, last_match + match_length - 1)
+  } else {
+    # No sentence ending found - keep as is but trim at word boundary
+    last_space <- regexpr("\\s[^\\s]*$", trimmed)
+    if (last_space > 0) {
+      text <- substr(trimmed, 1, last_space)
+    } else {
+      text <- trimmed
+    }
   }
 
   # Trim trailing whitespace
@@ -112,9 +128,6 @@ trim_to_limit <- function(text, max_chars) {
 
   # Balance markdown asterisks
   text <- balance_markdown_asterisks(text)
-
-  # Append ellipsis
-  text <- paste0(text, "...")
 
   return(text)
 }
