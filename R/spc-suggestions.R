@@ -284,7 +284,7 @@ VIGTIGE REGLER:
 #'   - y_axis_unit: Unit of measurement (e.g., "dage", "antal", "procent")
 #'   - target_value: Target value (numeric, optional)
 #' @param min_chars Minimum characters in response (default: 300)
-#' @param max_chars Maximum characters in response (default: 400)
+#' @param max_chars Maximum characters in response (default: 375)
 #' @param use_rag Logical, use RAG for SPC methodology context (default: TRUE)
 #' @param cache Cache object from bfhllm_cache_create() or bfhllm_cache_shiny() (optional)
 #' @param ... Additional arguments passed to bfhllm_chat() (model, timeout, etc.)
@@ -339,7 +339,7 @@ VIGTIGE REGLER:
 bfhllm_spc_suggestion <- function(spc_result,
                                    context,
                                    min_chars = 300,
-                                   max_chars = 400,
+                                   max_chars = 375,
                                    use_rag = TRUE,
                                    cache = NULL,
                                    ...) {
