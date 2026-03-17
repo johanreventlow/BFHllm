@@ -48,8 +48,8 @@ gemini_validate_setup <- function() {
 
 #' Call Gemini API
 #'
-#' Wrapper for calling Google Gemini API via ellmer with circuit breaker
-#' protection and timeout handling.
+#' Wrapper for calling Google Gemini API via ellmer with rate limiting,
+#' circuit breaker protection, and timeout handling.
 #'
 #' @param prompt Character string, prompt to send
 #' @param model Character string, model identifier
@@ -69,6 +69,13 @@ gemini_call_api <- function(prompt, model, timeout) {
     stop("Circuit breaker open - too many recent failures. Try again later.",
       call. = FALSE
     )
+  }
+
+  # Check rate limit (venter eller returnerer fallback afhængigt af behavior)
+  rate_limit_result <- rate_limiter_check_and_wait()
+  if (!is.null(rate_limit_result)) {
+    # degrade mode: returnér fallback-besked som response
+    return(rate_limit_result)
   }
 
   # Initialize chat
@@ -101,6 +108,9 @@ gemini_call_api <- function(prompt, model, timeout) {
 
   # Record success
   circuit_breaker_record_success()
+
+  # Registrer request i rate limiter
+  rate_limiter_record_request()
 
   return(response)
 }

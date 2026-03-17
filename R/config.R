@@ -12,7 +12,8 @@ NULL
 # Default configuration
 .bfhllm_env$config <- list(
   provider = "gemini",
-  model = "gemini-2.5-flash-lite",
+  #model = "gemini-2.5-flash-lite",
+  model = "gemini-3.1-flash-lite-preview",
   timeout_seconds = 10,
   max_response_chars = 350,
   circuit_breaker = list(
@@ -23,6 +24,12 @@ NULL
   cache = list(
     enabled = TRUE,
     ttl_seconds = 3600
+  ),
+  rate_limit = list(
+    enabled = TRUE,
+    rpm = 15,
+    rpd = 1500,
+    behavior = "wait"
   )
 )
 
@@ -39,6 +46,14 @@ NULL
 #' @param max_response_chars Integer, maximum response length (default: 350)
 #' @param circuit_breaker List with circuit breaker settings (optional)
 #' @param cache List with cache settings (optional)
+#' @param rate_limit List with rate limit settings (optional):
+#'   \describe{
+#'     \item{enabled}{Logical, enable/disable rate limiting (default: TRUE)}
+#'     \item{rpm}{Integer, max requests per minute (default: 15, Free Tier)}
+#'     \item{rpd}{Integer, max requests per day (default: 1500, Free Tier)}
+#'     \item{behavior}{Character, "wait" (sleep until capacity) or "degrade"
+#'       (return fallback message). Default: "wait"}
+#'   }
 #'
 #' @return Invisibly returns the updated configuration list
 #'
@@ -70,7 +85,8 @@ bfhllm_configure <- function(provider = NULL,
                               timeout_seconds = NULL,
                               max_response_chars = NULL,
                               circuit_breaker = NULL,
-                              cache = NULL) {
+                              cache = NULL,
+                              rate_limit = NULL) {
   # Get current config
   config <- .bfhllm_env$config
 
@@ -88,6 +104,11 @@ bfhllm_configure <- function(provider = NULL,
   # Update cache settings
   if (!is.null(cache)) {
     config$cache <- modifyList(config$cache, cache)
+  }
+
+  # Update rate limit settings
+  if (!is.null(rate_limit)) {
+    config$rate_limit <- modifyList(config$rate_limit, rate_limit)
   }
 
   # Store updated config
@@ -219,6 +240,12 @@ bfhllm_reset_config <- function() {
     cache = list(
       enabled = TRUE,
       ttl_seconds = 3600
+    ),
+    rate_limit = list(
+      enabled = TRUE,
+      rpm = 15,
+      rpd = 1500,
+      behavior = "wait"
     )
   )
 
