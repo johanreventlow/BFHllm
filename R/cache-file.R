@@ -21,8 +21,8 @@
 #' Cachen bruger en enkelt RDS index-fil til at gemme alle entries.
 #' Filen placeres i en `.bfhllm_cache` undermappe af `cache_dir`.
 #'
-#' Fordi data gemmes paa disk, overlever cachen R-sessions og kan
-#' tilgaas af flere separate koersler der peger paa samme `cache_dir`.
+#' Fordi data gemmes paa disk, overlever cachen R-sessions.
+#' Designet til single-process brug – ikke egnet til concurrent adgang.
 #'
 #' @examples
 #' \dontrun{
@@ -45,6 +45,10 @@
 #'
 #' @export
 bfhllm_file_cache_create <- function(cache_dir) {
+  if (!is.character(cache_dir) || length(cache_dir) != 1 || nchar(cache_dir) == 0) {
+    stop("cache_dir must be a non-empty character string", call. = FALSE)
+  }
+
   cache_path <- file.path(cache_dir, ".bfhllm_cache")
   if (!dir.exists(cache_path)) {
     dir.create(cache_path, recursive = TRUE)
@@ -54,14 +58,27 @@ bfhllm_file_cache_create <- function(cache_dir) {
 
   load_index <- function() {
     if (file.exists(index_file)) {
-      readRDS(index_file)
+      tryCatch(
+        readRDS(index_file),
+        error = function(e) {
+          warning("Corrupt cache index file, treating as empty cache: ",
+                  conditionMessage(e), call. = FALSE)
+          list()
+        }
+      )
     } else {
       list()
     }
   }
 
   save_index <- function(index) {
-    saveRDS(index, index_file)
+    tryCatch(
+      saveRDS(index, index_file),
+      error = function(e) {
+        warning("Failed to save cache index: ",
+                conditionMessage(e), call. = FALSE)
+      }
+    )
   }
 
   list(
@@ -79,7 +96,7 @@ bfhllm_file_cache_create <- function(cache_dir) {
         timestamp = Sys.time()
       )
       save_index(index)
-      invisible(value)
+      invisible(NULL)
     },
 
     has = function(key) {
@@ -88,8 +105,10 @@ bfhllm_file_cache_create <- function(cache_dir) {
     },
 
     clear = function() {
+      index <- load_index()
+      n_entries <- length(index)
       save_index(list())
-      invisible(TRUE)
+      invisible(n_entries)
     },
 
     stats = function() {

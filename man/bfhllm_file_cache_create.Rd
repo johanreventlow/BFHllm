@@ -27,8 +27,8 @@ Cachen overlever R-sessions og kan deles mellem koersler.
 Cachen bruger en enkelt RDS index-fil til at gemme alle entries.
 Filen placeres i en \code{.bfhllm_cache} undermappe af \code{cache_dir}.
 
-Fordi data gemmes paa disk, overlever cachen R-sessions og kan
-tilgaas af flere separate koersler der peger paa samme \code{cache_dir}.
+Fordi data gemmes paa disk, overlever cachen R-sessions.
+Designet til single-process brug – ikke egnet til concurrent adgang.
 }
 \examples{
 \dontrun{

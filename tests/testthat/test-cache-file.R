@@ -2,7 +2,8 @@
 # Tests for File-Based Cache
 
 test_that("bfhllm_file_cache_create creates cache object", {
-  tmp <- tempdir()
+  tmp <- file.path(tempdir(), "test_cache_0")
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
   cache <- bfhllm_file_cache_create(cache_dir = tmp)
   expect_true(is.list(cache))
   expect_true(all(c("get", "set", "has", "clear", "stats") %in% names(cache)))
