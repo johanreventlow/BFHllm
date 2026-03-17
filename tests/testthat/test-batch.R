@@ -336,6 +336,7 @@ test_that("bfhllm_spc_suggestions_batch stops on rpd_exhausted", {
 
   expect_true(result$rpd_exhausted)
   expect_equal(result$from_api, 0L)
+  expect_equal(length(result$failed), 3L)
 })
 
 test_that("bfhllm_spc_suggestions_batch handles API returning NULL", {
@@ -364,4 +365,9 @@ test_that("bfhllm_spc_suggestions_batch handles API returning NULL", {
   # Alle keys skal vaere i failed
   expect_equal(length(result$failed), 2L)
   expect_equal(result$from_api, 0L)
+})
+
+test_that("bfhllm_spc_suggestions_batch rejects invalid input", {
+  expect_error(bfhllm_spc_suggestions_batch(list()), "non-empty named list")
+  expect_error(bfhllm_spc_suggestions_batch(NULL), "non-empty named list")
 })
