@@ -96,7 +96,7 @@ bfhllm_file_cache_create <- function(cache_dir) {
       index <- load_index()
       list(
         entries = length(index),
-        cache_dir = cache_path
+        cache_dir = cache_dir
       )
     }
   )

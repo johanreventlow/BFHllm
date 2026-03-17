@@ -7,7 +7,8 @@
 bfhllm_spc_suggestion(
   spc_result,
   context,
-  max_chars = 350,
+  min_chars = 300,
+  max_chars = 375,
   use_rag = TRUE,
   cache = NULL,
   ...
@@ -24,7 +25,9 @@ bfhllm_spc_suggestion(
 \item target_value: Target value (numeric, optional)
 }}
 
-\item{max_chars}{Maximum characters in response (default: 350)}
+\item{min_chars}{Minimum characters in response (default: 300)}
+
+\item{max_chars}{Maximum characters in response (default: 375)}
 
 \item{use_rag}{Logical, use RAG for SPC methodology context (default: TRUE)}
 

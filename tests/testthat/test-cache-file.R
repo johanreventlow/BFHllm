@@ -71,3 +71,23 @@ test_that("file cache stats returns counts", {
   stats <- cache$stats()
   expect_equal(stats$entries, 2L)
 })
+
+test_that("file cache stats returns user-supplied cache_dir", {
+  tmp <- file.path(tempdir(), "test_cache_7")
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+  cache <- bfhllm_file_cache_create(cache_dir = tmp)
+
+  stats <- cache$stats()
+  expect_equal(normalizePath(stats$cache_dir, mustWork = FALSE),
+               normalizePath(tmp, mustWork = FALSE))
+})
+
+test_that("file cache set overwrites existing key", {
+  tmp <- file.path(tempdir(), "test_cache_8")
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+  cache <- bfhllm_file_cache_create(cache_dir = tmp)
+
+  cache$set("key1", "A")
+  cache$set("key1", "B")
+  expect_equal(cache$get("key1"), "B")
+})

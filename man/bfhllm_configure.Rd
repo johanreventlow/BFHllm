@@ -10,7 +10,8 @@ bfhllm_configure(
   timeout_seconds = NULL,
   max_response_chars = NULL,
   circuit_breaker = NULL,
-  cache = NULL
+  cache = NULL,
+  rate_limit = NULL
 )
 }
 \arguments{
@@ -25,6 +26,15 @@ bfhllm_configure(
 \item{circuit_breaker}{List with circuit breaker settings (optional)}
 
 \item{cache}{List with cache settings (optional)}
+
+\item{rate_limit}{List with rate limit settings (optional):
+\describe{
+\item{enabled}{Logical, enable/disable rate limiting (default: TRUE)}
+\item{rpm}{Integer, max requests per minute (default: 15, Free Tier)}
+\item{rpd}{Integer, max requests per day (default: 1500, Free Tier)}
+\item{behavior}{Character, "wait" (sleep until capacity) or "degrade"
+(return fallback message). Default: "wait"}
+}}
 }
 \value{
 Invisibly returns the updated configuration list

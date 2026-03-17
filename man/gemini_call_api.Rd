@@ -17,7 +17,7 @@ gemini_call_api(prompt, model, timeout)
 Raw response from ellmer, or NULL on error
 }
 \description{
-Wrapper for calling Google Gemini API via ellmer with circuit breaker
-protection and timeout handling.
+Wrapper for calling Google Gemini API via ellmer with rate limiting,
+circuit breaker protection, and timeout handling.
 }
 \keyword{internal}

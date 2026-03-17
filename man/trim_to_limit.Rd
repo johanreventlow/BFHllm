@@ -12,14 +12,14 @@ trim_to_limit(text, max_chars)
 \item{max_chars}{Integer, maximum allowed characters}
 }
 \value{
-Character string, trimmed text with "..." appended
+Character string, trimmed text ending with complete sentence
 }
 \description{
 Trims text to maximum character limit while:
 \itemize{
-\item Preserving word boundaries (no mid-word cuts)
+\item Preserving complete sentences (finds last sentence-ending punctuation)
 \item Balancing markdown asterisks
-\item Appending "..." to indicate truncation
+\item Never appending "..." - text ends with complete sentence
 }
 }
 \keyword{internal}
