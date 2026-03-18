@@ -39,7 +39,61 @@ make_test_contexts <- function(n = 3) {
   contexts
 }
 
+# HELPERS V2 (med baseline_analysis) ==========================================
+
+# Opdater make_test_context til at inkludere baseline_analysis
+make_test_context_v2 <- function(key = "diagram_1",
+                                  chart_type = "run",
+                                  n_points = 24L,
+                                  signals = 0L) {
+  list(
+    spc_result = list(
+      metadata = list(
+        chart_type = chart_type,
+        n_points = n_points,
+        signals_detected = signals,
+        anhoej_rules = list(
+          longest_run = 5L,
+          n_crossings = 10L,
+          n_crossings_min = 8L
+        )
+      )
+    ),
+    llm_context = list(
+      data_definition = paste("Indikator for", key),
+      chart_title = paste("Titel", key),
+      y_axis_unit = "procent",
+      target_value = 95,
+      department = paste("Afdeling", key),
+      baseline_analysis = paste("Processen viser stabil adfaerd for", key, ". Niveauet er ved maalet (95)."),
+      signal_examples = "Ingen"
+    )
+  )
+}
+
+make_test_contexts_v2 <- function(n = 3) {
+  keys <- paste0("diagram_", seq_len(n))
+  contexts <- lapply(keys, function(k) make_test_context_v2(key = k))
+  names(contexts) <- keys
+  contexts
+}
+
 # BUILD BATCH PROMPT ==========================================================
+
+test_that("build_batch_prompt uses rewrite approach when baseline_analysis present", {
+  contexts <- make_test_contexts_v2(2)
+
+  prompt <- build_batch_prompt(contexts, min_chars = 300, max_chars = 375)
+
+  # Skal indeholde baseline-analyser
+  expect_true(grepl("Processen viser stabil", prompt, fixed = TRUE))
+  # Skal indeholde afdeling
+  expect_true(grepl("Afdeling diagram_1", prompt, fixed = TRUE))
+  # Skal instruere omskrivning, ikke fri generering
+  expect_true(grepl("omskriv", prompt, ignore.case = TRUE))
+  # Skal IKKE indeholde gammel "generer" instruktion
+  expect_false(grepl("Generer en kort, positivt", prompt, fixed = TRUE))
+})
 
 test_that("build_batch_prompt creates prompt with all diagram keys", {
   contexts <- make_test_contexts(3)

@@ -18,8 +18,80 @@
 build_batch_prompt <- function(contexts, min_chars, max_chars) {
   keys <- names(contexts)
 
-  # Byg diagram-sektioner
+  # Detect om kontekster har baseline_analysis
+  has_baselines <- all(vapply(keys, function(key) {
+    bl <- contexts[[key]]$llm_context$baseline_analysis
+    !is.null(bl) && nchar(bl) > 0
+  }, logical(1)))
 
+  if (has_baselines) {
+    build_batch_prompt_rewrite(contexts, keys, min_chars, max_chars)
+  } else {
+    build_batch_prompt_legacy(contexts, keys, min_chars, max_chars)
+  }
+}
+
+# NY: Omskriv-baseret batch-prompt
+build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
+  diagram_sections <- vapply(keys, function(key) {
+    ctx <- contexts[[key]]
+    llm <- ctx$llm_context
+
+    sprintf(
+      paste0(
+        "### %s\n",
+        "BASELINE: \"%s\"\n",
+        "- Indikator: %s\n",
+        "- Definition: %s\n",
+        "- Afdeling: %s\n",
+        "- Enhed: %s"
+      ),
+      key,
+      llm$baseline_analysis %||% "",
+      llm$chart_title %||% "Ikke angivet",
+      llm$data_definition %||% "Ikke angivet",
+      llm$department %||% "Ikke angivet",
+      llm$y_axis_unit %||% "enheder"
+    )
+  }, character(1))
+
+  diagrams_text <- paste(diagram_sections, collapse = "\n\n")
+
+  # JSON eksempel
+  json_example_entries <- paste(
+    vapply(keys, function(k) sprintf('  "%s": "omskrevet analyse..."', k), character(1)),
+    collapse = ",\n"
+  )
+  json_example <- paste0("{\n", json_example_entries, "\n}")
+
+  sprintf(
+    paste0(
+      "Du skal omskrive SPC-analysetekster saa de bliver specifikke for de konkrete indikatorer.\n\n",
+      "For HVERT af de %d diagrammer nedenfor: omskriv BASELINE-teksten saa den specifikt handler om indikatoren.\n\n",
+      "REGLER:\n",
+      "- Bevar det faglige indhold og alle talv\u00e6rdier pr\u00e6cist\n",
+      "- Tilf\u00f8j IKKE information der ikke findes i baseline-analysen\n",
+      "- Mark\u00e9r handlingsanbefalingen (sidste del) med **fed**\n",
+      "- Handlingsanbefalingen m\u00e5 omformuleres let, men budskabet skal v\u00e6re det samme\n",
+      "- Hver analyse: mellem %d og %d tegn\n",
+      "- Dansk sprog, professionel tone\n",
+      "- Afslut ALTID med en komplet s\u00e6tning\n\n",
+      "OUTPUT FORMAT:\n",
+      "Returner UDELUKKENDE valid JSON (ingen anden tekst):\n",
+      "%s\n\n",
+      "DIAGRAMMER:\n\n",
+      "%s"
+    ),
+    length(keys),
+    min_chars,
+    max_chars,
+    json_example,
+    diagrams_text
+  )
+}
+
+# GAMMEL: Behold som backward compatibility
+build_batch_prompt_legacy <- function(contexts, keys, min_chars, max_chars) {
   diagram_sections <- vapply(keys, function(key) {
     ctx <- contexts[[key]]
     meta <- ctx$spc_result$metadata
@@ -91,7 +163,7 @@ build_batch_prompt <- function(contexts, min_chars, max_chars) {
   json_example <- paste0("{\n", json_example_entries, "\n}")
 
   # Samlet prompt
-  prompt <- sprintf(
+  sprintf(
     paste0(
       "Du er en ekspert i Statistical Process Control (SPC) og klinisk kvalitetsforbedring.\n\n",
       "Generer en kort, positivt og handlingsorienteret analyse for HVERT af de %d SPC-diagrammer nedenfor.\n\n",
@@ -113,8 +185,6 @@ build_batch_prompt <- function(contexts, min_chars, max_chars) {
     json_example,
     diagrams_text
   )
-
-  prompt
 }
 
 
