@@ -411,70 +411,90 @@ bfhllm_spc_suggestion <- function(spc_result,
     }
   }
 
-  # Step 4: Query RAG knowledge store (if enabled)
-  rag_context <- NULL
+  # Step 4+5: Build prompt (vaelg template baseret paa om baseline_analysis er leveret)
+  has_baseline <- !is.null(context$baseline_analysis) &&
+    nchar(context$baseline_analysis) > 0
 
-  if (use_rag) {
-    # Determine target comparison
+  if (has_baseline) {
+    # NYT: Omskriv-tilgang - brug baseline som fundament
+    template <- get_spc_rewrite_prompt_template()
+
+    prompt_data <- list(
+      baseline_analysis = context$baseline_analysis,
+      chart_title = context$chart_title %||% "",
+      data_definition = context$data_definition %||% "",
+      department = context$department %||% "",
+      y_axis_unit = context$y_axis_unit %||% "",
+      min_chars = min_chars,
+      max_chars = max_chars
+    )
+
+    prompt <- bfhllm_interpolate(template, prompt_data)
+
+    # Skip RAG for rewrite (baseline er allerede fagligt korrekt)
+
+  } else {
+    # GAMMEL: Generering fra bunden (backward compatibility)
+    rag_context <- NULL
+
+    if (use_rag) {
+      # Determine target comparison
+      target_comparison <- determine_target_comparison(
+        metadata$centerline,
+        context$target_value
+      )
+
+      # Build RAG query from chart characteristics
+      rag_query <- sprintf(
+        "%s chart with %s variation, %d signals detected, level %s target",
+        metadata$chart_type,
+        metadata$process_variation,
+        metadata$signals_detected,
+        target_comparison
+      )
+
+      # Query knowledge store (graceful fallback on error)
+      rag_results <- suppressWarnings(
+        bfhllm_query_knowledge(
+          query = rag_query,
+          top_k = 3,
+          method = "hybrid"
+        )
+      )
+
+      # Format RAG context if results available
+      if (!is.null(rag_results)) {
+        rag_context <- bfhllm_format_rag_context(rag_results, max_chunks = 3)
+      }
+    }
+
+    template <- get_spc_prompt_template()
+
     target_comparison <- determine_target_comparison(
       metadata$centerline,
       context$target_value
     )
 
-    # Build RAG query from chart characteristics
-    rag_query <- sprintf(
-      "%s chart with %s variation, %d signals detected, level %s target",
-      metadata$chart_type,
-      metadata$process_variation,
-      metadata$signals_detected,
-      target_comparison
-    )
-
-    # Query knowledge store (graceful fallback on error)
-    rag_results <- suppressWarnings(
-      bfhllm_query_knowledge(
-        query = rag_query,
-        top_k = 3,
-        method = "hybrid"
+    prompt_data <- c(
+      metadata,
+      context,
+      list(
+        target_comparison = target_comparison,
+        min_chars = min_chars,
+        max_chars = max_chars
       )
     )
 
-    # Format RAG context if results available
-    if (!is.null(rag_results)) {
-      rag_context <- bfhllm_format_rag_context(rag_results, max_chunks = 3)
+    prompt <- bfhllm_interpolate(template, prompt_data)
+
+    # Append RAG context if available (kun for gammel tilgang)
+    if (!is.null(rag_context)) {
+      rag_section <- sprintf(
+        "\n\n## SPC Metodologi Reference\n\nBrug f\u00f8lgende autoritativ SPC metodologi som reference til at grunde dit svar:\n\n%s\n",
+        rag_context
+      )
+      prompt <- paste0(prompt, rag_section)
     }
-  }
-
-  # Step 5: Build prompt
-  template <- get_spc_prompt_template()
-
-  # Determine target comparison for prompt
-  target_comparison <- determine_target_comparison(
-    metadata$centerline,
-    context$target_value
-  )
-
-  # Combine all prompt data
-  prompt_data <- c(
-    metadata,
-    context,
-    list(
-      target_comparison = target_comparison,
-      min_chars = min_chars,
-      max_chars = max_chars
-    )
-  )
-
-  # Interpolate template
-  prompt <- bfhllm_interpolate(template, prompt_data)
-
-  # Append RAG context if available
-  if (!is.null(rag_context)) {
-    rag_section <- sprintf(
-      "\n\n## SPC Metodologi Reference\n\nBrug følgende autoritativ SPC metodologi som reference til at grunde dit svar:\n\n%s\n",
-      rag_context
-    )
-    prompt <- paste0(prompt, rag_section)
   }
 
   # Step 6: Call LLM

@@ -263,6 +263,88 @@ test_that("bfhllm_spc_suggestion builds correct RAG query", {
   expect_true(TRUE)
 })
 
+# Test bfhllm_spc_suggestion() rewrite vs legacy ==============================
+
+test_that("bfhllm_spc_suggestion uses rewrite template when baseline_analysis provided", {
+  spc_result <- list(
+    metadata = list(
+      chart_type = "run",
+      n_points = 24,
+      signals_detected = 0,
+      anhoej_rules = list(longest_run = 4, n_crossings = 12, n_crossings_min = 11)
+    ),
+    qic_data = data.frame(
+      x = 1:24,
+      y = rnorm(24, 10, 2),
+      cl = rep(10, 24)
+    )
+  )
+
+  context <- list(
+    data_definition = "Median ventetid fra henvisning til operation",
+    chart_title = "Ventetid ortopaedkirurgi",
+    y_axis_unit = "dage",
+    target_value = 30,
+    department = "Ortopaedkirurgisk afdeling",
+    baseline_analysis = "Processen viser stabil adfaerd. Niveauet er ved maalet."
+  )
+
+  # Mock bfhllm_chat til at returnere omskrevet tekst
+  captured_prompt <- NULL
+  mock_chat <- function(prompt, ...) {
+    captured_prompt <<- prompt
+    "Ventetiden til ortopaedkirurgisk operation viser stabil adfaerd. **Fasthold det nuvaerende niveau.**"
+  }
+
+  mockery::stub(bfhllm_spc_suggestion, "bfhllm_chat", mock_chat)
+
+  result <- bfhllm_spc_suggestion(spc_result, context, use_rag = FALSE)
+
+  # Prompten skal indeholde baseline-analysen
+  expect_true(grepl("Processen viser stabil", captured_prompt, fixed = TRUE))
+  # Prompten skal indeholde kontekst
+  expect_true(grepl("Ventetid ortopaedkirurgi", captured_prompt, fixed = TRUE))
+  expect_true(grepl("Ortopaedkirurgisk afdeling", captured_prompt, fixed = TRUE))
+  # Prompten skal IKKE indeholde gammel "generer fra bunden"-instruktion
+  expect_false(grepl("Mere end X gange", captured_prompt, fixed = TRUE))
+})
+
+test_that("bfhllm_spc_suggestion falls back to old template without baseline_analysis", {
+  spc_result <- list(
+    metadata = list(
+      chart_type = "run",
+      n_points = 24,
+      signals_detected = 0
+    ),
+    qic_data = data.frame(
+      x = 1:24,
+      y = rnorm(24, 10, 2),
+      cl = rep(10, 24)
+    )
+  )
+
+  context <- list(
+    data_definition = "Test",
+    chart_title = "Test",
+    y_axis_unit = "antal",
+    target_value = 10
+    # Ingen baseline_analysis
+  )
+
+  captured_prompt <- NULL
+  mock_chat <- function(prompt, ...) {
+    captured_prompt <<- prompt
+    "Fallback response text."
+  }
+
+  mockery::stub(bfhllm_spc_suggestion, "bfhllm_chat", mock_chat)
+
+  result <- bfhllm_spc_suggestion(spc_result, context, use_rag = FALSE)
+
+  # Skal bruge gammel template (backward compatibility)
+  expect_true(grepl("SPC ANALYSE:", captured_prompt, fixed = TRUE))
+})
+
 # Test get_spc_rewrite_prompt_template() =======================================
 
 test_that("get_spc_rewrite_prompt_template returns valid rewrite template", {
