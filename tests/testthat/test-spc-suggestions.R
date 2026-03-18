@@ -263,6 +263,38 @@ test_that("bfhllm_spc_suggestion builds correct RAG query", {
   expect_true(TRUE)
 })
 
+# Test get_spc_rewrite_prompt_template() =======================================
+
+test_that("get_spc_rewrite_prompt_template returns valid rewrite template", {
+  template <- get_spc_rewrite_prompt_template()
+
+  expect_type(template, "character")
+  expect_gt(nchar(template), 200)
+
+  # Skal indeholde rewrite-specifikke placeholders
+  expect_true(grepl("{{baseline_analysis}}", template, fixed = TRUE))
+  expect_true(grepl("{{chart_title}}", template, fixed = TRUE))
+  expect_true(grepl("{{data_definition}}", template, fixed = TRUE))
+  expect_true(grepl("{{department}}", template, fixed = TRUE))
+  expect_true(grepl("{{y_axis_unit}}", template, fixed = TRUE))
+  expect_true(grepl("{{min_chars}}", template, fixed = TRUE))
+  expect_true(grepl("{{max_chars}}", template, fixed = TRUE))
+
+  # Skal IKKE indeholde de gamle "generer fra bunden"-instruktioner
+  expect_false(grepl("Mere end X gange", template, fixed = TRUE))
+  expect_false(grepl("EKSEMPEL:", template, fixed = TRUE))
+  expect_false(grepl("SPC ANALYSE:", template, fixed = TRUE))
+})
+
+test_that("get_spc_prompt_template is deprecated in favor of rewrite template", {
+  # Gammel template eksisterer stadig men er deprecated
+  old_template <- get_spc_prompt_template()
+  new_template <- get_spc_rewrite_prompt_template()
+
+  # Ny template er kortere (omskrivning vs. generering)
+  expect_lt(nchar(new_template), nchar(old_template))
+})
+
 # Test get_spc_prompt_template() ===============================================
 
 test_that("get_spc_prompt_template returns valid template", {

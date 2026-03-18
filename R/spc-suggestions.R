@@ -273,6 +273,40 @@ VIGTIGE REGLER:
   return(template)
 }
 
+#' Get SPC Rewrite Prompt Template
+#'
+#' Returns the Danish prompt template for rewriting fallback analyses
+#' with indicator-specific context. This replaces the old free-generation
+#' template with a constrained rewrite approach.
+#'
+#' @return Character string with prompt template containing {{placeholders}}
+#'
+#' @keywords internal
+get_spc_rewrite_prompt_template <- function() {
+  "
+Du skal omskrive en SPC-analysetekst saa den bliver specifik for den konkrete indikator.
+
+BASELINE-ANALYSE (fagligt korrekt - bevar indholdet):
+\"{{baseline_analysis}}\"
+
+KONTEKST:
+- Indikator: {{chart_title}}
+- Definition: {{data_definition}}
+- Afdeling: {{department}}
+- Enhed: {{y_axis_unit}}
+
+REGLER:
+- Omskriv baseline-analysen saa den specifikt handler om denne indikator
+- Bevar det faglige indhold og alle talv\u00e6rdier pr\u00e6cist
+- Tilf\u00f8j IKKE information der ikke findes i baseline-analysen
+- Mark\u00e9r handlingsanbefalingen (sidste del) med **fed**
+- Handlingsanbefalingen maa omformuleres let, men budskabet skal v\u00e6re det samme
+- Dansk sprog, professionel tone
+- Mellem {{min_chars}} og {{max_chars}} tegn
+- Afslut med en komplet s\u00e6tning
+"
+}
+
 #' Generate SPC Improvement Suggestion
 #'
 #' Main function for generating AI-powered improvement suggestions for SPC charts.
