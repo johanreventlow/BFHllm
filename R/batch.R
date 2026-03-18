@@ -37,6 +37,13 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
     ctx <- contexts[[key]]
     llm <- ctx$llm_context
 
+    target_line <- if (!is.null(llm$target_display) &&
+                       nchar(llm$target_display) > 0) {
+      sprintf("- Maal (som vist i diagram): %s\n", llm$target_display)
+    } else {
+      ""
+    }
+
     sprintf(
       paste0(
         "### %s\n",
@@ -44,14 +51,16 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
         "- Indikator: %s\n",
         "- Definition: %s\n",
         "- Afdeling: %s\n",
-        "- Enhed: %s"
+        "- Enhed: %s\n",
+        "%s"
       ),
       key,
       llm$baseline_analysis %||% "",
       llm$chart_title %||% "Ikke angivet",
       llm$data_definition %||% "Ikke angivet",
       llm$department %||% "Ikke angivet",
-      llm$y_axis_unit %||% "enheder"
+      llm$y_axis_unit %||% "enheder",
+      target_line
     )
   }, character(1))
 
@@ -71,8 +80,9 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
       "REGLER:\n",
       "- Bevar det faglige indhold og alle talv\u00e6rdier pr\u00e6cist\n",
       "- Tilf\u00f8j IKKE information der ikke findes i baseline-analysen\n",
-      "- Mark\u00e9r handlingsanbefalingen (sidste del) med **fed**\n",
       "- Handlingsanbefalingen m\u00e5 omformuleres let, men budskabet skal v\u00e6re det samme\n",
+      "- Brug **fed** til at fremh\u00e6ve 5-15 ord der udtrykker vurderingen af processen og det centrale i anbefalingen. Marker IKKE titler, navne eller m\u00e5lv\u00e6rdier med fed\n",
+      "- Naar et maal naevnes, brug vaerdien fra 'Maal (som vist i diagram)' feltet - det er det format brugeren ser i diagrammet\n",
       "- Hver analyse: mellem %d og %d tegn\n",
       "- Dansk sprog, professionel tone\n",
       "- Afslut ALTID med en komplet s\u00e6tning\n\n",
@@ -391,6 +401,44 @@ bfhllm_spc_suggestions_batch <- function(contexts,
     # Kald LLM
     response <- bfhllm_chat(prompt, max_chars = NULL, validate = FALSE)
 
+    # Log prompt + response til debug-fil (hvis log_dir sat)
+    if (!is.null(cache_dir)) {
+      log_dir <- file.path(cache_dir, "llm_debug")
+      if (!dir.exists(log_dir)) {
+        dir.create(log_dir, recursive = TRUE, showWarnings = FALSE)
+      }
+      log_file <- file.path(
+        log_dir,
+        sprintf("batch_%s_%02d.json",
+                format(Sys.time(), "%Y%m%d_%H%M%S"), i)
+      )
+      log_entry <- list(
+        timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
+        batch_index = i,
+        diagram_keys = batch_keys,
+        prompt = prompt,
+        raw_response = as.character(response %||% "NULL"),
+        per_diagram_input = lapply(batch_keys, function(k) {
+          llm <- batch_contexts[[k]]$llm_context
+          list(
+            key = k,
+            baseline_analysis = llm$baseline_analysis %||% "",
+            chart_title = llm$chart_title %||% "",
+            data_definition = llm$data_definition %||% "",
+            department = llm$department %||% "",
+            y_axis_unit = llm$y_axis_unit %||% ""
+          )
+        })
+      )
+      tryCatch(
+        writeLines(
+          jsonlite::toJSON(log_entry, auto_unbox = TRUE, pretty = TRUE),
+          log_file
+        ),
+        error = function(e) NULL
+      )
+    }
+
     # Haandter fejl fra API
     if (is.null(response)) {
       failed <- c(failed, batch_keys)
@@ -415,6 +463,33 @@ bfhllm_spc_suggestions_batch <- function(contexts,
       } else {
         failed <- c(failed, key)
       }
+    }
+
+    # Log parsed resultater per diagram (tilfoej til debug-fil)
+    if (!is.null(cache_dir)) {
+      parsed_log <- file.path(
+        cache_dir, "llm_debug",
+        sprintf("batch_%s_%02d_parsed.json",
+                format(Sys.time(), "%Y%m%d_%H%M%S"), i)
+      )
+      parsed_entries <- lapply(batch_keys, function(k) {
+        llm <- batch_contexts[[k]]$llm_context
+        list(
+          key = k,
+          input_baseline = llm$baseline_analysis %||% "",
+          input_title = llm$chart_title %||% "",
+          input_definition = llm$data_definition %||% "",
+          input_department = llm$department %||% "",
+          output_from_llm = as.character(parsed[[k]] %||% "FAILED")
+        )
+      })
+      tryCatch(
+        writeLines(
+          jsonlite::toJSON(parsed_entries, auto_unbox = TRUE, pretty = TRUE),
+          parsed_log
+        ),
+        error = function(e) NULL
+      )
     }
   }
 

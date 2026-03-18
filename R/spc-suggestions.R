@@ -294,16 +294,18 @@ KONTEKST:
 - Definition: {{data_definition}}
 - Afdeling: {{department}}
 - Enhed: {{y_axis_unit}}
+- Maal (som vist i diagram): {{target_display}}
 
 REGLER:
 - Omskriv baseline-analysen saa den specifikt handler om denne indikator
 - Bevar det faglige indhold og alle talv\u00e6rdier pr\u00e6cist
 - Tilf\u00f8j IKKE information der ikke findes i baseline-analysen
-- Mark\u00e9r handlingsanbefalingen (sidste del) med **fed**
 - Handlingsanbefalingen maa omformuleres let, men budskabet skal v\u00e6re det samme
+- Brug **fed** til at fremh\u00e6ve 5-15 ord der udtrykker vurderingen af processen og det centrale i anbefalingen. Marker IKKE titler, navne eller maalvaerdier med fed
+- Naar et maal naevnes, brug vaerdien fra 'Maal (som vist i diagram)' feltet under KONTEKST - det er det format brugeren ser i diagrammet
 - Dansk sprog, professionel tone
 - Mellem {{min_chars}} og {{max_chars}} tegn
-- Afslut med en komplet s\u00e6tning
+- Afslut med en komplet saetning
 "
 }
 
