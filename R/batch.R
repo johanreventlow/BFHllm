@@ -18,7 +18,6 @@
 build_batch_prompt <- function(contexts, min_chars, max_chars) {
   keys <- names(contexts)
 
-  # Brug altid rewrite-prompt (legacy kun som absolut fallback)
   # Diagrammer uden baseline haandteres af rewrite-prompten
   build_batch_prompt_rewrite(contexts, keys, min_chars, max_chars)
 }
@@ -130,103 +129,6 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
       "- Afslut ALTID med en komplet saetning\n\n",
       "OUTPUT FORMAT:\n",
       "Returner UDELUKKENDE valid JSON (ingen anden tekst):\n",
-      "%s\n\n",
-      "DIAGRAMMER:\n\n",
-      "%s"
-    ),
-    length(keys),
-    min_chars,
-    max_chars,
-    json_example,
-    diagrams_text
-  )
-}
-
-# GAMMEL: Behold som backward compatibility
-build_batch_prompt_legacy <- function(contexts, keys, min_chars, max_chars) {
-  diagram_sections <- vapply(keys, function(key) {
-    ctx <- contexts[[key]]
-    meta <- ctx$spc_result$metadata
-    llm <- ctx$llm_context
-
-    # Udtræk metadata med sikre defaults
-    chart_type <- meta$chart_type %||% "unknown"
-    chart_type_dansk <- bfhllm_map_chart_type_danish(chart_type)
-    n_points <- meta$n_points %||% 0L
-    signals_detected <- meta$signals_detected %||% 0L
-
-    # Anhoej-regler
-    anhoej <- meta$anhoej_rules %||% list()
-    longest_run <- anhoej$longest_run %||% 0L
-    n_crossings <- anhoej$n_crossings %||% 0L
-    n_crossings_min <- anhoej$n_crossings_min %||% 0L
-
-    # Procesvariation
-    process_variation <- if (signals_detected > 0) {
-      "ikke naturligt"
-    } else {
-      "naturligt"
-    }
-
-    # LLM kontekst
-    data_definition <- llm$data_definition %||% "Ikke angivet"
-    chart_title <- llm$chart_title %||% "Ikke angivet"
-    y_axis_unit <- llm$y_axis_unit %||% "enheder"
-    target_value <- llm$target_value %||% "Ikke angivet"
-    signal_examples <- llm$signal_examples %||% "Ingen"
-
-    sprintf(
-      paste0(
-        "### %s\n",
-        "- Indikator: %s\n",
-        "- Titel: %s\n",
-        "- Enhed: %s\n",
-        "- Chart type: %s\n",
-        "- Antal observationer: %s\n",
-        "- Signaler: %s\n",
-        "- Proces varierer: %s\n",
-        "- L\u00e6ngste serie: %s punkter\n",
-        "- Krydsninger: %s (forventet: %s)\n",
-        "- Target: %s\n",
-        "- Signaleksempler: %s"
-      ),
-      key,
-      data_definition,
-      chart_title,
-      y_axis_unit,
-      chart_type_dansk,
-      n_points,
-      signals_detected,
-      process_variation,
-      longest_run,
-      n_crossings, n_crossings_min,
-      target_value,
-      signal_examples
-    )
-  }, character(1))
-
-  diagrams_text <- paste(diagram_sections, collapse = "\n\n")
-
-  # JSON eksempel baseret paa keys
-  json_example_entries <- paste(
-    vapply(keys, function(k) sprintf('  "%s": "analyse tekst..."', k), character(1)),
-    collapse = ",\n"
-  )
-  json_example <- paste0("{\n", json_example_entries, "\n}")
-
-  # Samlet prompt
-  sprintf(
-    paste0(
-      "Du er en ekspert i Statistical Process Control (SPC) og klinisk kvalitetsforbedring.\n\n",
-      "Generer en kort, positivt og handlingsorienteret analyse for HVERT af de %d SPC-diagrammer nedenfor.\n\n",
-      "KRITISKE REGLER:\n",
-      "- Hver analyse skal v\u00e6re mellem %d og %d tegn\n",
-      "- Dansk sprog\n",
-      "- Konkret og handlingsorienteret\n",
-      "- Brug **fed** til 1-2 forslag\n",
-      "- Afslut ALTID med en komplet s\u00e6tning\n\n",
-      "OUTPUT FORMAT:\n",
-      "Returner UDELUKKENDE valid JSON med f\u00f8lgende struktur (ingen anden tekst):\n",
       "%s\n\n",
       "DIAGRAMMER:\n\n",
       "%s"
