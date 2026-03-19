@@ -12,7 +12,7 @@ NULL
 # Default configuration
 .bfhllm_env$config <- list(
   provider = "gemini",
-  model = "gemini-2.5-flash",
+  model = "gemini-3.1-flash-lite-preview",
   timeout_seconds = 120,
   max_response_chars = 350,
   circuit_breaker = list(
@@ -26,8 +26,8 @@ NULL
   ),
   rate_limit = list(
     enabled = TRUE,
-    rpm = 10,
-    rpd = 250,
+    rpm = 15,
+    rpd = 1000,
     behavior = "wait"
   )
 )
@@ -228,7 +228,7 @@ bfhllm_validate_setup <- function() {
 bfhllm_reset_config <- function() {
   .bfhllm_env$config <- list(
     provider = "gemini",
-    model = "gemini-2.5-flash",
+    model = "gemini-3.1-flash-lite-preview",
     timeout_seconds = 120,
     max_response_chars = 350,
     circuit_breaker = list(
@@ -242,8 +242,8 @@ bfhllm_reset_config <- function() {
     ),
     rate_limit = list(
       enabled = TRUE,
-      rpm = 10,
-      rpd = 250,
+      rpm = 15,
+      rpd = 1000,
       behavior = "wait"
     )
   )
