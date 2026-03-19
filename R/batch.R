@@ -18,17 +18,9 @@
 build_batch_prompt <- function(contexts, min_chars, max_chars) {
   keys <- names(contexts)
 
-  # Detect om kontekster har baseline_analysis
-  has_baselines <- all(vapply(keys, function(key) {
-    bl <- contexts[[key]]$llm_context$baseline_analysis
-    !is.null(bl) && nchar(bl) > 0
-  }, logical(1)))
-
-  if (has_baselines) {
-    build_batch_prompt_rewrite(contexts, keys, min_chars, max_chars)
-  } else {
-    build_batch_prompt_legacy(contexts, keys, min_chars, max_chars)
-  }
+  # Brug altid rewrite-prompt (legacy kun som absolut fallback)
+  # Diagrammer uden baseline haandteres af rewrite-prompten
+  build_batch_prompt_rewrite(contexts, keys, min_chars, max_chars)
 }
 
 # NY: Omskriv-baseret batch-prompt
@@ -112,7 +104,8 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
       "- Omformuler til naturligt, professionelt dansk\n",
       "- Brug **fed** til at fremhaeve den centrale konklusion (fx '**en bevidst procesaendring er noedvendig**')\n",
       "- Naar et maal naevnes, brug vaerdien fra 'Maal (som vist i diagram)' feltet\n",
-      "- Respekt\u00e9r 'Maalstatus': Hvis OPFYLDT, skriv om at fastholde niveauet - ALDRIG om at 'naa maalet'\n\n",
+      "- Respekt\u00e9r 'Maalstatus': Hvis OPFYLDT, skriv om at fastholde niveauet - ALDRIG om at 'naa maalet'\n",
+      "- Hvis BASELINE er tom: skriv en kort tekst baseret KUN paa 'Anbefalet handling' og 'Maalstatus' - opfind INTET\n\n",
       "HVAD DU ABSOLUT IKKE MAA:\n",
       "- ALDRIG foreslaa specifikke tiltag (checklister, traening, audits, systemer, procedurer, interventioner)\n",
       "- ALDRIG tilfoeje aarsagsforklaringer eller hypoteser\n",
