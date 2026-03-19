@@ -14,7 +14,7 @@ NULL
   provider = "gemini",
   #model = "gemini-2.5-flash-lite",
   model = "gemini-3.1-flash-lite-preview",
-  timeout_seconds = 10,
+  timeout_seconds = 120,
   max_response_chars = 350,
   circuit_breaker = list(
     enabled = TRUE,
@@ -230,7 +230,7 @@ bfhllm_reset_config <- function() {
   .bfhllm_env$config <- list(
     provider = "gemini",
     model = "gemini-2.5-flash-lite",
-    timeout_seconds = 10,
+    timeout_seconds = 120,
     max_response_chars = 350,
     circuit_breaker = list(
       enabled = TRUE,
