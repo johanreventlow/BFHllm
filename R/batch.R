@@ -44,6 +44,30 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
       ""
     }
 
+    # Centerline og maalstatus fra pipeline
+    centerline_line <- if (!is.null(llm$centerline) &&
+                           !is.na(llm$centerline)) {
+      sprintf("- Aktuel centerlinje: %s\n",
+              format(round(llm$centerline, 3), decimal.mark = ","))
+    } else {
+      ""
+    }
+
+    target_status_line <- if (isTRUE(llm$at_target)) {
+      "- Maalstatus: OPFYLDT (processen er paa eller over maalet)\n"
+    } else if (!is.null(llm$at_target) && !llm$at_target) {
+      "- Maalstatus: IKKE OPFYLDT\n"
+    } else {
+      ""
+    }
+
+    action_line <- if (!is.null(llm$action_text) &&
+                       nchar(llm$action_text) > 0) {
+      sprintf("- Anbefalet handling: %s\n", llm$action_text)
+    } else {
+      ""
+    }
+
     sprintf(
       paste0(
         "### %s\n",
@@ -52,6 +76,9 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
         "- Definition: %s\n",
         "- Afdeling: %s\n",
         "- Enhed: %s\n",
+        "%s",
+        "%s",
+        "%s",
         "%s"
       ),
       key,
@@ -60,7 +87,10 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
       llm$data_definition %||% "Ikke angivet",
       llm$department %||% "Ikke angivet",
       llm$y_axis_unit %||% "enheder",
-      target_line
+      target_line,
+      centerline_line,
+      target_status_line,
+      action_line
     )
   }, character(1))
 
@@ -80,6 +110,8 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
       "REGLER:\n",
       "- Bevar det faglige indhold og alle talv\u00e6rdier pr\u00e6cist\n",
       "- Tilf\u00f8j IKKE information der ikke findes i baseline-analysen\n",
+      "- VIGTIG: Respekt\u00e9r 'Maalstatus' feltet. Hvis det siger OPFYLDT, SKRIV ALDRIG om at 'naa maalet' eller 'forbedre mod maalet' - skriv i stedet om at fastholde niveauet\n",
+      "- Brug 'Anbefalet handling' som rettesnor for din konklusion\n",
       "- Handlingsanbefalingen m\u00e5 omformuleres let, men budskabet skal v\u00e6re det samme\n",
       "- Brug **fed** til at fremh\u00e6ve 5-15 ord der udtrykker vurderingen af processen og det centrale i anbefalingen. Marker IKKE titler, navne eller m\u00e5lv\u00e6rdier med fed\n",
       "- Naar et maal naevnes, brug vaerdien fra 'Maal (som vist i diagram)' feltet - det er det format brugeren ser i diagrammet\n",
