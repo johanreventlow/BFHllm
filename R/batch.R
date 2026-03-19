@@ -46,9 +46,8 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
 
     # Centerline og maalstatus fra pipeline
     centerline_line <- if (!is.null(llm$centerline) &&
-                           !is.na(llm$centerline)) {
-      sprintf("- Aktuel centerlinje: %s\n",
-              format(round(llm$centerline, 3), decimal.mark = ","))
+                           nchar(as.character(llm$centerline)) > 0) {
+      sprintf("- Aktuel centerlinje: %s\n", llm$centerline)
     } else {
       ""
     }
