@@ -44,9 +44,9 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
     }
 
     target_status_line <- if (isTRUE(llm$at_target)) {
-      "- Maalstatus: OPFYLDT (processen er paa eller over maalet)\n"
+      "- M\u00e5lstatus: OPFYLDT (processen er p\u00e5 eller over m\u00e5let)\n"
     } else if (!is.null(llm$at_target) && !llm$at_target) {
-      "- Maalstatus: IKKE OPFYLDT\n"
+      "- M\u00e5lstatus: IKKE OPFYLDT\n"
     } else {
       ""
     }
@@ -95,38 +95,38 @@ build_batch_prompt_rewrite <- function(contexts, keys, min_chars, max_chars) {
 
   sprintf(
     paste0(
-      "Du skal omformulere SPC-analysetekster. Du omskriver BASELINE-teksten saa den naevner den konkrete indikator ved navn - men du AENDRER IKKE BUDSKABET.\n\n",
+      "Du skal omformulere SPC-analysetekster. Du omskriver BASELINE-teksten s\u00e5 den n\u00e6vner den konkrete indikator ved navn - men du \u00c6NDRER IKKE BUDSKABET.\n\n",
       "For HVERT af de %d diagrammer nedenfor:\n\n",
       "HVAD DU SKAL:\n",
-      "- Goer teksten specifik ved at naevne indikatoren (fx 'antibiotikabehandling inden 3 timer' i stedet for 'processen')\n",
-      "- Bevar ALLE konklusioner og talvaerdier fra baseline praecist\n",
+      "- G\u00f8r teksten specifik ved at n\u00e6vne indikatoren (fx 'antibiotikabehandling inden 3 timer' i stedet for 'processen')\n",
+      "- Bevar ALLE konklusioner og talv\u00e6rdier fra baseline pr\u00e6cist\n",
       "- Omformuler til naturligt, professionelt dansk\n",
-      "- Brug **fed** til at fremhaeve den centrale konklusion (fx '**en bevidst procesaendring er noedvendig**')\n",
-      "- Naar et maal naevnes, brug vaerdien fra 'Maal (som vist i diagram)' feltet\n",
-      "- Respekt\u00e9r 'Maalstatus': Hvis OPFYLDT, skriv om at fastholde niveauet - ALDRIG om at 'naa maalet'\n",
-      "- Hvis BASELINE er tom: skriv en kort tekst baseret KUN paa 'Anbefalet handling' og 'Maalstatus' - opfind INTET\n\n",
-      "HVAD DU ABSOLUT IKKE MAA:\n",
-      "- ALDRIG foreslaa specifikke tiltag (checklister, traening, audits, systemer, procedurer, interventioner)\n",
-      "- ALDRIG tilfoeje aarsagsforklaringer eller hypoteser\n",
-      "- ALDRIG tilfoeje information der ikke staar i baseline\n",
-      "- Din tekst skal have PRAECIS SAMME informationsindhold som baseline - bare bedre formuleret og specifik for indikatoren\n\n",
-      "EKSEMPLER PAA KORREKT OMSKRIVNING:\n\n",
-      "Eksempel 1 (stabil, under maal):\n",
-      "Baseline: \"Processen viser stabil adfaerd. Niveauet ligger under maalet (60%%). Forbedring kraever en bevidst aendring af processen - den nuvaerende praksis vil levere samme resultat.\"\n",
+      "- Brug **fed** til at fremh\u00e6ve den centrale konklusion (fx '**en bevidst proces\u00e6ndring er n\u00f8dvendig**')\n",
+      "- N\u00e5r et m\u00e5l n\u00e6vnes, brug v\u00e6rdien fra 'M\u00e5l (som vist i diagram)' feltet\n",
+      "- Respekt\u00e9r 'M\u00e5lstatus': Hvis OPFYLDT, skriv om at fastholde niveauet - ALDRIG om at 'n\u00e5 m\u00e5let'\n",
+      "- Hvis BASELINE er tom: skriv en kort tekst baseret KUN p\u00e5 'Anbefalet handling' og 'M\u00e5lstatus' - opfind INTET\n\n",
+      "HVAD DU ABSOLUT IKKE M\u00c5:\n",
+      "- ALDRIG foresl\u00e5 specifikke tiltag (checklister, tr\u00e6ning, audits, systemer, procedurer, interventioner)\n",
+      "- ALDRIG tilf\u00f8je \u00e5rsagsforklaringer eller hypoteser\n",
+      "- ALDRIG tilf\u00f8je information der ikke st\u00e5r i baseline\n",
+      "- Din tekst skal have PR\u00c6CIS SAMME informationsindhold som baseline - bare bedre formuleret og specifik for indikatoren\n\n",
+      "EKSEMPLER P\u00c5 KORREKT OMSKRIVNING:\n\n",
+      "Eksempel 1 (stabil, under m\u00e5l):\n",
+      "Baseline: \"Processen viser stabil adf\u00e6rd. Niveauet ligger under m\u00e5let (60%%). Forbedring kr\u00e6ver en bevidst \u00e6ndring af processen \u2013 den nuv\u00e6rende praksis vil levere samme resultat.\"\n",
       "Definition: \"Andelen af patienter der modtager antibiotika inden 3 timer\"\n",
-      "God omskrivning: \"Andelen af patienter der modtager antibiotika inden 3 timer er stabil, men naar endnu ikke maalet paa 60%%. **En bevidst processaendring er noedvendig** for at loefte niveauet - den nuvaerende tilgang vil fortsaette med at levere de samme resultater.\"\n\n",
-      "Eksempel 2 (stabil, maal opfyldt):\n",
-      "Baseline: \"Processen viser stabil adfaerd. Niveauet ligger taet paa maalet (97%%). Fortsaet den nuvaerende praksis og overvaag processen loebende for at fastholde det gode niveau.\"\n",
+      "God omskrivning: \"Andelen af patienter der modtager antibiotika inden 3 timer er stabil, men n\u00e5r endnu ikke m\u00e5let p\u00e5 60%%. **En bevidst proces\u00e6ndring er n\u00f8dvendig** for at l\u00f8fte niveauet \u2013 den nuv\u00e6rende tilgang vil forts\u00e6tte med at levere de samme resultater.\"\n\n",
+      "Eksempel 2 (stabil, m\u00e5l opfyldt):\n",
+      "Baseline: \"Processen viser stabil adf\u00e6rd. Niveauet ligger t\u00e6t p\u00e5 m\u00e5let (97%%). Forts\u00e6t den nuv\u00e6rende praksis og overv\u00e5g processen l\u00f8bende for at fastholde det gode niveau.\"\n",
       "Definition: \"Registreret komplet klinisk TNM\"\n",
-      "God omskrivning: \"Registrering af klinisk TNM er stabil og ligger taet paa maalet paa 97%%. **Fortsaet den nuvaerende praksis** og overvaag processen loebende for at fastholde det gode niveau.\"\n\n",
+      "God omskrivning: \"Registrering af klinisk TNM er stabil og ligger t\u00e6t p\u00e5 m\u00e5let p\u00e5 97%%. **Forts\u00e6t den nuv\u00e6rende praksis** og overv\u00e5g processen l\u00f8bende for at fastholde det gode niveau.\"\n\n",
       "Eksempel 3 (ustabil):\n",
-      "Baseline: \"Processen viser systematisk ustabilitet. Baade serielaengde (9 > 8) og antal krydsninger (12 < 13) afviger. Prioriter at identificere og fjerne de saerlige aarsager til variationen foer yderligere forbedringstiltag ivaerksaettes.\"\n",
-      "Definition: \"Andel patienter med ambulant opfoelgning inden 2 uger\"\n",
-      "God omskrivning: \"Ambulant opfoelgning inden 2 uger viser systematisk ustabilitet - baade serielaengde (9 > 8) og antal krydsninger (12 < 13) afviger fra det forventede. **Identificer og fjern de saerlige aarsager til variationen** foer yderligere forbedringstiltag ivaerksaettes.\"\n\n",
+      "Baseline: \"Processen viser systematisk ustabilitet. B\u00e5de seriel\u00e6ngde (9 > 8) og antal krydsninger (12 < 13) afviger. Priorit\u00e9r at identificere og fjerne de s\u00e6rlige \u00e5rsager til variationen f\u00f8r yderligere forbedringstiltag iv\u00e6rks\u00e6ttes.\"\n",
+      "Definition: \"Andel patienter med ambulant opf\u00f8lgning inden 2 uger\"\n",
+      "God omskrivning: \"Ambulant opf\u00f8lgning inden 2 uger viser systematisk ustabilitet \u2013 b\u00e5de seriel\u00e6ngde (9 > 8) og antal krydsninger (12 < 13) afviger fra det forventede. **Identificer og fjern de s\u00e6rlige \u00e5rsager til variationen** f\u00f8r yderligere forbedringstiltag iv\u00e6rks\u00e6ttes.\"\n\n",
       "FORMAT:\n",
       "- Hver analyse: mellem %d og %d tegn\n",
       "- Dansk sprog, professionel tone\n",
-      "- Afslut ALTID med en komplet saetning\n\n",
+      "- Afslut ALTID med en komplet s\u00e6tning\n\n",
       "OUTPUT FORMAT:\n",
       "Returner UDELUKKENDE valid JSON (ingen anden tekst):\n",
       "%s\n\n",
