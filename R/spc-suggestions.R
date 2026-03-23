@@ -220,57 +220,42 @@ determine_target_comparison <- function(centerline, target_value) {
   }
 }
 
+# Cache for prompt-templates
+.prompt_cache <- new.env(parent = emptyenv())
+
+# Indlæs SPC prompt-templates fra YAML
+load_spc_prompts <- function() {
+  if (!is.null(.prompt_cache$prompts)) {
+    return(.prompt_cache$prompts)
+  }
+
+  yaml_path <- system.file("prompts", "spc_prompts.yml",
+                           package = "BFHllm")
+  if (yaml_path == "") {
+    warning("spc_prompts.yml not found")
+    return(list())
+  }
+
+  prompts <- yaml::read_yaml(yaml_path)
+  .prompt_cache$prompts <- prompts
+  return(prompts)
+}
+
+
 #' Get SPC Improvement Suggestion Prompt Template
 #'
 #' Returns the Danish prompt template for SPC improvement suggestions.
+#' Loaded from inst/prompts/spc_prompts.yml.
 #'
 #' @return Character string with prompt template containing {{placeholders}}
 #'
 #' @keywords internal
 get_spc_prompt_template <- function() {
-  template <- "
-Du er en ekspert i Statistical Process Control (SPC) og klinisk kvalitetsforbedring. Du vurderer SPC-processer efter Anhøj-reglerne.
-
-Baseret på følgende SPC-data, skal du generere en kort positivt og handlingsorienteret analyse af et seriediagram (mellem {{min_chars}} og {{max_chars}} tegn) på dansk. Formater target_values i samme enhed som {{y_axis_unit}}.
-
-KONTEKST:
-- Indikator: {{data_definition}}
-- Titel: {{chart_title}}
-- Enhed: {{y_axis_unit}}
-- Chart type: {{chart_type_dansk}}
-- Antal observationer: {{n_points}}
-- Periode: {{start_date}} til {{end_date}}
-- Target: {{target_value}}
-- Centerline: {{centerline}}
-
-SPC ANALYSE:
-- Proces varierer {{process_variation}}
-- Antal særligt afvigende punkter: {{signals_detected}}
-- Længste serie: {{longest_run}} punkter
-- Antal krydsninger: {{n_crossings}} (forventet: {{n_crossings_min}})
-- Niveau vs. mål: {{target_comparison}}
-
-STRUKTUR (følg dette format):
-1. Start med kontekst (fx \"Mere end X gange om måneden...\")
-2. Beskriv processens variation (naturlig/ikke-naturlig, særlige punkter)
-3. Forhold til mål (over/under/ved)
-4. Konkret forslag markeret med **fed** (fx \"**Identificér årsager...**\")
-
-EKSEMPEL:
-\"Mere end 35.000 gange om måneden administreres medicin ikke korrekt. Processen varierer ikke naturligt, og indeholder 3 særligt afvigende målepunkter. Niveauet er under målet. Forslag: **Identificér årsager bag de afvigende målepunkter**, og understøt faktorer der kan forbedre målopfyldelsen. Stabilisér processen når niveauet er tilfredsstillende.\"
-
-VIGTIGE REGLER:
-- KRITISK: Svaret SKAL være mellem {{min_chars}} og {{max_chars}} tegn. Tæl tegnene nøje!
-- Afslut ALTID med en komplet sætning - aldrig med '...' eller afbrudte ord
-- Planlæg din tekst så den passer inden for grænsen og slutter naturligt
-- Dansk sprog
-- Konkret og handlingsorienteret
-- Brug fed (**tekst**) til forslag, men vær selektiv - kun 1-2 forslag, max 3 i sjældnere tilfælde.
-- Fokusér på forbedringsmuligheder
-- Undgå teknisk jargon - men hold professionel distance
-"
-
-  return(template)
+  prompts <- load_spc_prompts()
+  if (length(prompts) == 0 || is.null(prompts$generation_template)) {
+    stop("Could not load generation_template from spc_prompts.yml")
+  }
+  return(prompts$generation_template$prompt)
 }
 
 #' Get SPC Rewrite Prompt Template
@@ -283,30 +268,11 @@ VIGTIGE REGLER:
 #'
 #' @keywords internal
 get_spc_rewrite_prompt_template <- function() {
-  "
-Du skal omskrive en SPC-analysetekst saa den bliver specifik for den konkrete indikator.
-
-BASELINE-ANALYSE (fagligt korrekt - bevar indholdet):
-\"{{baseline_analysis}}\"
-
-KONTEKST:
-- Indikator: {{chart_title}}
-- Definition: {{data_definition}}
-- Afdeling: {{department}}
-- Enhed: {{y_axis_unit}}
-- Maal (som vist i diagram): {{target_display}}
-
-REGLER:
-- Omskriv baseline-analysen saa den specifikt handler om denne indikator
-- Bevar det faglige indhold og alle talv\u00e6rdier pr\u00e6cist
-- Tilf\u00f8j IKKE information der ikke findes i baseline-analysen
-- Handlingsanbefalingen maa omformuleres let, men budskabet skal v\u00e6re det samme
-- Brug **fed** til at fremh\u00e6ve 5-15 ord der udtrykker vurderingen af processen og det centrale i anbefalingen. Marker IKKE titler, navne eller maalvaerdier med fed
-- Naar et maal naevnes, brug vaerdien fra 'Maal (som vist i diagram)' feltet under KONTEKST - det er det format brugeren ser i diagrammet
-- Dansk sprog, professionel tone
-- Mellem {{min_chars}} og {{max_chars}} tegn
-- Afslut med en komplet saetning
-"
+  prompts <- load_spc_prompts()
+  if (length(prompts) == 0 || is.null(prompts$rewrite_template)) {
+    stop("Could not load rewrite_template from spc_prompts.yml")
+  }
+  return(prompts$rewrite_template$prompt)
 }
 
 #' Generate SPC Improvement Suggestion
