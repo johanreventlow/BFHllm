@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue close:*)",
+      "Bash(gh issue list:*)",
+      "Bash(git commit:*)",
+      "Bash(find:*)",
+      "Bash(awk:*)",
+      "Bash(gh:*)",
+      "Bash(Rscript:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Read(//Users/johanreventlow/Documents/R/**)",
+      "Read(//Users/johanreventlow/.claude/rules/**)",
+      "WebSearch",
+      "Bash(rg:*)",
+      "Bash(openspec list:*)",
+      "Bash(openspec validate:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
