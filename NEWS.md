@@ -1,3 +1,12 @@
+# BFHllm 0.1.2
+
+## Bug fixes
+
+* Tilføjet `Remotes:` for `BFHcharts` (Suggests). Downstream-installationer
+  kunne tidligere fejle ved `--as-cran` tests der forsøger at installere
+  Suggests. Fra v0.1.2 er transitiv dep-resolution konsistent med sibling-
+  pakkerne (BFHcharts v0.8.1).
+
 # BFHllm 0.1.1
 
 ## Bug fixes
