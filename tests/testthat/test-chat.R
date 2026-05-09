@@ -21,8 +21,8 @@ test_that("bfhllm_chat uses configuration defaults", {
 
   config <- bfhllm_get_config()
 
-  expect_equal(config$model, "gemini-2.5-flash-lite")
-  expect_equal(config$timeout_seconds, 10)
+  expect_equal(config$model, "gemini-3.1-flash-lite")
+  expect_equal(config$timeout_seconds, 120)
   expect_equal(config$max_response_chars, 350)
 })
 

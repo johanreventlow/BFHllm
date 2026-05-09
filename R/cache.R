@@ -100,7 +100,7 @@ bfhllm_cache_create <- function(ttl_seconds = 3600) {
 #' # Basic key generation
 #' key <- bfhllm_generate_cache_key(
 #'   prompt = "What is SPC?",
-#'   model = "gemini-2.5-flash-lite"
+#'   model = "gemini-3.1-flash-lite"
 #' )
 #'
 #' # With metadata

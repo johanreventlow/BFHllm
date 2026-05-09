@@ -1,3 +1,24 @@
+# BFHllm 0.2.0
+
+## Nye features
+
+* Skiftet default LLM-model fra `gemini-3.1-flash-lite-preview` til
+  stable `gemini-3.1-flash-lite`. Sync af model-ID på tværs af
+  docstrings, README, eksempler og tests (tidligere drift mod
+  `gemini-2.5-flash-lite` rettet).
+* Tilføjet GitHub Actions workflows der spejler biSPCharts'
+  versioneringspolitik:
+  * `R-CMD-check.yaml` — smoke check på alle pushes/PRs til `main`
+  * `tag-release.yaml` — automatisk `vMAJOR.MINOR.PATCH`-tagging efter
+    grøn `R-CMD-check` på `main`. MAJOR.MINOR læses fra DESCRIPTION
+    (manuelt bump i PR), PATCH auto-inkrementeres pr. merge.
+
+## Bug fixes
+
+* Rettet stale test-assertions for default-config (`gemini-2.5-flash-lite`
+  → `gemini-3.1-flash-lite`, `timeout_seconds = 10` → `120`) som har
+  været brudt siden config-bumps i v0.1.x.
+
 # BFHllm 0.1.2
 
 ## Bug fixes

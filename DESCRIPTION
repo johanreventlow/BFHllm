@@ -1,6 +1,6 @@
 Package: BFHllm
 Title: LLM Integration Framework for BFH Packages
-Version: 0.1.2
+Version: 0.2.0
 Authors@R:
     person("Johan", "Reventlow", , "johan.reventlow@regionh.dk", role = c("aut", "cre"))
 Description: AI-driven insights and text generation for healthcare quality

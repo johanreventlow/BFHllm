@@ -30,8 +30,8 @@ cat(response, "\n\n")
 # Configure BFHllm (optional - uses sensible defaults)
 bfhllm_configure(
   provider = "gemini",
-  model = "gemini-2.5-flash-lite",
-  timeout_seconds = 10,
+  model = "gemini-3.1-flash-lite",
+  timeout_seconds = 120,
   max_response_chars = 350
 )
 

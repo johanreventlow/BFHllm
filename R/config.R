@@ -12,7 +12,7 @@ NULL
 # Default configuration
 .bfhllm_env$config <- list(
   provider = "gemini",
-  model = "gemini-3.1-flash-lite-preview",
+  model = "gemini-3.1-flash-lite",
   timeout_seconds = 120,
   max_response_chars = 350,
   circuit_breaker = list(
@@ -40,8 +40,8 @@ NULL
 #' Configuration is stored in package environment and persists for the session.
 #'
 #' @param provider Character string, LLM provider name (default: "gemini")
-#' @param model Character string, model identifier (default: "gemini-2.5-flash-lite")
-#' @param timeout_seconds Numeric, API timeout in seconds (default: 10)
+#' @param model Character string, model identifier (default: "gemini-3.1-flash-lite")
+#' @param timeout_seconds Numeric, API timeout in seconds (default: 120)
 #' @param max_response_chars Integer, maximum response length (default: 350)
 #' @param circuit_breaker List with circuit breaker settings (optional)
 #' @param cache List with cache settings (optional)
@@ -228,7 +228,7 @@ bfhllm_validate_setup <- function() {
 bfhllm_reset_config <- function() {
   .bfhllm_env$config <- list(
     provider = "gemini",
-    model = "gemini-3.1-flash-lite-preview",
+    model = "gemini-3.1-flash-lite",
     timeout_seconds = 120,
     max_response_chars = 350,
     circuit_breaker = list(

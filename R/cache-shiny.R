@@ -39,7 +39,7 @@
 #'   observeEvent(input$generate_btn, {
 #'     key <- bfhllm_generate_cache_key(
 #'       prompt = input$prompt_text,
-#'       model = "gemini-2.5-flash-lite"
+#'       model = "gemini-3.1-flash-lite"
 #'     )
 #'
 #'     # Check cache first

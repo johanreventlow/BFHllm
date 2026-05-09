@@ -225,7 +225,7 @@ bfhllm_format_rag_context <- function(results,
 #' answer <- bfhllm_chat_with_rag(
 #'   question = "Interpret this control chart",
 #'   context = "8 points above centerline",
-#'   model = "gemini-2.5-flash-lite",
+#'   model = "gemini-3.1-flash-lite",
 #'   max_chars = 500,
 #'   cache = my_cache
 #' )

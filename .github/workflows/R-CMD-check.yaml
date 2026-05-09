@@ -1,0 +1,63 @@
+# R CMD check for BFHllm.
+# Smoke check med tests paa main + PRs.
+# Workflow name "R-CMD-check" matches tag-release.yaml workflow_run trigger.
+name: R-CMD-check
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  R-CMD-check:
+    runs-on: ubuntu-latest
+    name: check (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: ubuntu-latest, r: 'release'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      PKG_SYSREQS: "FALSE"
+      # Tom for at sikre tests ikke rammer rigtig API i CI.
+      GOOGLE_API_KEY: ""
+      GEMINI_API_KEY: ""
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          use-public-rspm: true
+
+      # System dev-headers for source-pkgs (curl, openssl, xml2, etc).
+      - name: Pre-install system deps
+        run: |
+          sudo apt-get install -y \
+            libcurl4-openssl-dev libssl-dev libgit2-dev \
+            zlib1g-dev libicu-dev libxml2-dev
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      # error-on "error" = warnings tilladt initielt.
+      # Skaerp til "warning" naar baseline er ren.
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          error-on: '"error"'
+          args: 'c("--no-manual")'

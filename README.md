@@ -132,8 +132,8 @@ Currently supports Google Gemini via [ellmer](https://github.com/hadley/ellmer).
 # Configure LLM settings
 bfhllm_configure(
   provider = "gemini",
-  model = "gemini-2.5-flash-lite",
-  timeout_seconds = 10,
+  model = "gemini-3.1-flash-lite",
+  timeout_seconds = 120,
   max_response_chars = 350
 )
 

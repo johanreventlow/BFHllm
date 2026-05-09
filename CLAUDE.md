@@ -163,6 +163,28 @@ cache <- session$userData$.bfhllm_cache
 - Migration guide
 - Notification to downstream packages (SPCify)
 
+### Versioning & Auto-Tagging
+
+Følger `~/.claude/rules/VERSIONING_POLICY.md` (semver 2.0, pre-1.0 regler)
+spejlet på biSPCharts' implementation:
+
+- **MAJOR.MINOR i `DESCRIPTION`** bumpes manuelt i PR (følg semver-tabellen
+  i policy: `feat:` → MINOR, `fix:` → PATCH, breaking i body → MAJOR
+  post-1.0 / markeret MINOR pre-1.0)
+- **PATCH auto-inkrementeres** af `.github/workflows/tag-release.yaml`
+  efter grøn `R-CMD-check` på `main`
+- Tag-format `vMAJOR.MINOR.PATCH` (annoteret), første tag pr. nye
+  MAJOR.MINOR-baseline = `vMAJOR.MINOR.0`
+- NEWS.md skal have entry under den aktuelle DESCRIPTION-version
+  før merge til `main` (template + sektioner: se policy §C)
+
+**Workflows:**
+- `.github/workflows/R-CMD-check.yaml` — gating på warnings
+- `.github/workflows/tag-release.yaml` — auto-tag efter success
+
+**Manuelt MINOR/MAJOR bump:** Rediger `Version:` i DESCRIPTION + tilføj
+NEWS.md-entry i samme PR. Auto-tagging tager sig af PATCH derefter.
+
 ### Security Considerations
 
 **API Key Handling:**
@@ -269,14 +291,14 @@ bfhllm_chat_with_rag(prompt, knowledge_store, n_results = 3, model = NULL, ...)
 bfhllm_spc_suggestion(spc_result, context = list(), knowledge_store = NULL, ...)
 
 # Configuration
-bfhllm_configure(provider = "gemini", model = "gemini-2.0-flash-lite", timeout_seconds = 10, ...)
+bfhllm_configure(provider = "gemini", model = "gemini-3.1-flash-lite", timeout_seconds = 120, ...)
 ```
 
 **Graceful Defaults:**
 - Auto-detect API key from environment (`GOOGLE_API_KEY` or `GEMINI_API_KEY`)
-- Fallback to sensible model defaults (`gemini-2.0-flash-lite`)
+- Fallback to sensible model defaults (`gemini-3.1-flash-lite`)
 - Circuit breaker auto-reset (60 seconds)
-- Reasonable timeout (10 seconds default)
+- Reasonable timeout (120 seconds default)
 - Session-scoped caching in Shiny context
 
 ### Development Commands
