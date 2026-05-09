@@ -200,9 +200,12 @@ test_that("bfhllm_spc_suggestion uses cache if provided", {
   cache <- bfhllm_cache_create()
   cached_response <- "Cached suggestion text"
 
-  # Manually set cache (simulate previous call)
+  # Manually set cache (simulate previous call). cache_data skal matche
+  # bfhllm_spc_suggestion's interne nøgle: metadata + context +
+  # list(min_chars, max_chars). Default-args (min_chars=300, max_chars=375)
+  # bruges naar funktionen kaldes uden eksplicitte vaerdier.
   metadata <- bfhllm_extract_spc_metadata(spc_result)
-  cache_data <- c(metadata, context, list(max_chars = 350))
+  cache_data <- c(metadata, context, list(min_chars = 300, max_chars = 375))
   cache_key <- bfhllm_generate_cache_key(cache_data)
   cache$set(cache_key, cached_response)
 

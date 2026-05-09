@@ -27,7 +27,7 @@ NULL
   rate_limit = list(
     enabled = TRUE,
     rpm = 15,
-    rpd = 1000,
+    rpd = 1500,
     behavior = "wait"
   )
 )
@@ -243,7 +243,7 @@ bfhllm_reset_config <- function() {
     rate_limit = list(
       enabled = TRUE,
       rpm = 15,
-      rpd = 1000,
+      rpd = 1500,
       behavior = "wait"
     )
   )
