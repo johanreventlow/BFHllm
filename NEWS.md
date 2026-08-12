@@ -1,3 +1,15 @@
+# BFHllm 0.2.1
+
+## Interne ændringer
+
+* Grundig revision af README mod faktisk kode.
+* Rettet Version-drift: `tag-release.yaml` auto-tagger PATCH ved hver
+  merge til `main` uden at bumpe `DESCRIPTION`'s `Version:`-felt, så
+  taggen (v0.2.1) og pakkens rapporterede version (0.2.0) var kommet ud
+  af sync. Downstream-forbrugere der installerer fra `@v0.2.1` fik derfor
+  en pakke der selv rapporterede 0.2.0. Workflowets grundlæggende adfærd
+  er uændret i denne commit — kun DESCRIPTION er bragt i sync med tagget.
+
 # BFHllm 0.2.0
 
 ## Nye features
