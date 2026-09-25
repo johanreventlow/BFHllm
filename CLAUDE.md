@@ -19,8 +19,6 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 # Claude Instructions – BFHllm
 
-- Mac: `@~/.claude/rules/CLAUDE_BOOTSTRAP_WORKFLOW.md`
-- Windows: `@C:/Users/jrev0004/.claude/rules/CLAUDE_BOOTSTRAP_WORKFLOW.md`
 
 ---
 
@@ -165,7 +163,7 @@ cache <- session$userData$.bfhllm_cache
 
 ### Versioning & Auto-Tagging
 
-Følger `~/.claude/rules/VERSIONING_POLICY.md` (semver 2.0, pre-1.0 regler)
+Følger `~/.claude/rules-ondemand/VERSIONING_POLICY.md` (semver 2.0, pre-1.0 regler)
 spejlet på biSPCharts' implementation:
 
 - **MAJOR.MINOR i `DESCRIPTION`** bumpes manuelt i PR (følg semver-tabellen
@@ -496,11 +494,8 @@ test_that("cache returns identical results for same prompt", {
 ## 📚 Global Standards Reference
 
 **Dette projekt følger:**
-- **R Development:** `~/.claude/rules/R_STANDARDS.md`
-- **Architecture Patterns:** `~/.claude/rules/ARCHITECTURE_PATTERNS.md`
-- **Git Workflow:** `~/.claude/rules/GIT_WORKFLOW.md`
-- **Development Philosophy:** `~/.claude/rules/DEVELOPMENT_PHILOSOPHY.md`
-- **Troubleshooting:** `~/.claude/rules/TROUBLESHOOTING_GUIDE.md`
+- **R Development:** `~/.claude/rules-profiles/r/R_STANDARDS.md`
+- **Architecture Patterns:** `~/.claude/rules-profiles/shiny/ARCHITECTURE_PATTERNS.md`
 
 **Globale agents:** tidyverse-code-reviewer, performance-optimizer, security-reviewer, test-coverage-analyzer, refactoring-advisor, legacy-code-detector, r-package-code-reviewer
 
